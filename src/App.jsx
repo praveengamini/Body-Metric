@@ -17,7 +17,7 @@ const handleMeasure = async () => {
     <div className="p-4">
        <WebcamCapture photo={photo} setPhoto={setPhoto} />
     </div>
-        <button onClick={handleMeasure}>know cm per pixel</button>
+        <button onClick={handleMeasure} className='bg-yellow-300'>cm per pixel density</button>
 
       </div>
   );
