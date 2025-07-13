@@ -1,14 +1,13 @@
-import React from 'react'
-import WebcamCapture from './CameraCapture'
-import UseRef from './useRef'
-import CheckingDistance from './CheckingDistance'
+import React from 'react';
+import WebcamCapture from './CameraCapture';
+import BodyMeasurementApp from './BodyMeasurementApp';
+
 const App = () => {
   return (
     <div>
-      <WebcamCapture />
-      <CheckingDistance />
-    </div>
-  )
-}
+      <BodyMeasurementApp />
+      </div>
+  );
+};
 
-export default App
+export default App;
