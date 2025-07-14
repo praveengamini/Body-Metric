@@ -27,7 +27,7 @@ const detectEyeDistanceCmPerPixel = async (photo) => {
       }
 
       const face = predictions[0];
-      const leftEye = face.landmarks[0]; // [x, y]
+      const leftEye = face.landmarks[0];
       const rightEye = face.landmarks[1];
 
       const eyePixelDistance = Math.hypot(
@@ -43,7 +43,7 @@ const detectEyeDistanceCmPerPixel = async (photo) => {
       ctx.lineTo(rightEye[0], rightEye[1]);
       ctx.stroke();
 
-      const cmPerPixel = 6.3 / eyePixelDistance; // 70mm = 7cm
+      const cmPerPixel =  27/ eyePixelDistance; // 70mm = 7cm
       const transformedPhoto = canvas.toDataURL("image/png");
 
       resolve({ cmPerPixel, transformedPhoto });

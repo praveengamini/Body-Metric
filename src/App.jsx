@@ -20,7 +20,6 @@ const App = () => {
   useEffect(() => {
     const initializeTensorFlow = async () => {
       try {
-        // Force webgl backend
         await tf.setBackend('webgl');
         await tf.ready();
         console.log("TensorFlow.js initialized with backend:", tf.getBackend());
@@ -36,7 +35,6 @@ const App = () => {
   const handleDetectEyeDistance = async () => {
     const { cmPerPixel, transformedPhoto } = await detectEyeDistanceCmPerPixel(photo);
     if (cmPerPixel) {
-      console.log("Eye-based scale:", cmPerPixel.toFixed(4), "cm/pixel");
       setDensity(cmPerPixel.toFixed(4));
       setEyeScalePhoto(transformedPhoto);
     } else {
@@ -45,15 +43,7 @@ const App = () => {
   };
 
   const handleDetectBodyMeasurements = async () => {
-    if (!photo || !density) {
-      console.log("Please detect eye distance first.");
-      return;
-    }
-
-    if (!tfReady) {
-      console.log("TensorFlow.js not ready yet.");
-      return;
-    }
+    if (!photo || !density || !tfReady) return;
 
     setIsProcessing(true);
     
@@ -64,12 +54,8 @@ const App = () => {
         setChestLength(measurementData.chest);
         setWaistLength(measurementData.waist);
         setHipLength(measurementData.hip);
-        
-        // Draw measurement lines
         const annotatedPhoto = await drawMeasurements(photo, measurementData);
         setMeasurementPhoto(annotatedPhoto);
-        
-        console.log("Measurements:", measurementData);
       } else {
         console.log("Could not detect body measurements.");
       }
@@ -81,40 +67,55 @@ const App = () => {
   };
 
   return (
-    <div className="p-4">
-      <WebcamCapture photo={photo} setPhoto={setPhoto} />
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white p-4">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold text-center mb-6">Body Metric</h1>
 
-      <button onClick={handleDetectEyeDistance} className="mt-4 px-4 py-2 bg-yellow-400 text-black rounded">
-        Detect cm per pixel (using eyes)
-      </button>
+        <WebcamCapture photo={photo} setPhoto={setPhoto} />
 
-      <button 
-        onClick={handleDetectBodyMeasurements} 
-        disabled={!photo || !density || isProcessing || !tfReady}
-        className="mt-4 ml-4 px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
-      >
-        {isProcessing ? 'Processing...' : !tfReady ? 'Initializing...' : 'Detect Body Measurements'}
-      </button>
+        <div className="flex flex-wrap gap-4 justify-center mt-6">
+          <button
+            onClick={handleDetectEyeDistance}
+            className="px-6 py-2 bg-yellow-400 hover:bg-yellow-300 text-black font-semibold rounded shadow transition"
+          >
+            Detect cm per pixel (eyes)
+          </button>
 
-      {eyeScalePhoto && (
-        <div className="mt-6">
-          <p className="text-lg font-medium">Detected Eye Line:</p>
-          <img src={eyeScalePhoto} alt="Eye Measurement" className="w-[320px] mt-2 border" />
+          <button
+            onClick={handleDetectBodyMeasurements}
+            disabled={!photo || !density || isProcessing || !tfReady}
+            className={`px-6 py-2 font-semibold rounded shadow transition ${
+              isProcessing || !tfReady || !density
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }`}
+          >
+            {isProcessing ? 'Processing...' : !tfReady ? 'Initializing...' : 'Detect Body Measurements'}
+          </button>
         </div>
-      )}
 
-      {measurementPhoto && (
-        <div className="mt-6">
-          <p className="text-lg font-medium">Body Measurements:</p>
-          <img src={measurementPhoto} alt="Body Measurements" className="w-[320px] mt-2 border" />
-          <div className="mt-4 text-sm">
-            <p>Chest: {chestLength} cm</p>
-            <p>Waist: {waistLength} cm</p>
-            <p>Hip: {hipLength} cm</p>
-            <p>Scale: {density} cm/pixel</p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+          {eyeScalePhoto && (
+            <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+              <h2 className="text-xl font-semibold mb-2">Detected Eye Line</h2>
+              <img src={eyeScalePhoto} alt="Eye Measurement" className="w-full rounded border" />
+            </div>
+          )}
+
+          {measurementPhoto && (
+            <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+              <h2 className="text-xl font-semibold mb-2">Body Measurements</h2>
+              <img src={measurementPhoto} alt="Body Measurements" className="w-full rounded border mb-3" />
+              <div className="text-sm">
+                <p><strong>Chest:</strong> {chestLength} cm / {(chestLength / 2.54).toFixed(1)} inch</p>
+                <p><strong>Waist:</strong> {waistLength} cm / {(waistLength / 2.54).toFixed(1)} inch</p>
+                <p><strong>Hip:</strong> {hipLength} cm / {(hipLength / 2.54).toFixed(1)} inch</p>
+                <p><strong>Scale:</strong> {density} cm/pixel</p>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
