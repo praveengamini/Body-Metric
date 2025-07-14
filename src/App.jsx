@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgl';
-import WebcamCapture from './components/WebcamCapture.jsx';
+import WebcamCapture from './components/WebCamCapture.jsx';
 import detectEyeDistanceCmPerPixel from './utilities/detectEyeDistanceCmPerPixel.js';
 import detectBodyMeasurements from './utilities/detectBodyMeasurements.js';
 import drawMeasurements from './utilities/drawMeasurements.js';
